@@ -1,0 +1,19 @@
+.env
+
+# Ignore node_modules directory
+node_modules
+
+# Ignore build directories
+/build
+/dist
+
+# Ignore coverage reports
+/coverage
+
+# Ignore configuration files
+.eslintrc
+.stylelintrc
+.prettierrc
+
+# Ignore specific files
+config.js
