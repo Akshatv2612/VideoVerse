@@ -1,7 +1,7 @@
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
-import {uploadOnCloudinary} from "../utils/cloudinary.js"
+import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -15,57 +15,60 @@ const registerUser = asyncHandler(async (req, res) => {
     // check for user creation
     // return response
 
-    const {username, email, fullname, password} = req.body
+    const { username, email, fullname, password } = req.body
 
     if ([username, email, fullname, password].some((field) => field?.trim() === ""))  //?. is optional chainning operator, It will not throw error if method in not there.
     {
         throw new ApiError(400, `${field} is required`);
     }
 
-    const existedUser=User.findOne({
-        $or:[{username},{email}]
+    const existedUser = await User.findOne({
+        $or: [{ username }, { email }]
     })
 
-    if(existedUser)
-    {
-        throw new ApiError(402,'username or email already present')
+    if (existedUser) {
+        throw new ApiError(402, 'username or email already present')
     }
 
-    const avatarLocalPath=req.files?.avatar[0]?.path
-    const coverImageLocalPath=req.files?.avatar[0]?.path
-
-    if(!avatarLocalPath)
-    {
-        throw new ApiError(404,'avatar required')
+    console.log(req.files)
+    const avatarLocalPath = req.files?.avatar[0]?.path
+    let coverImageLocalPath;
+    if (req.files?.coverimage) {
+        coverImageLocalPath = req.files?.coverimage[0].path
     }
 
-    const avatar=await uploadOnCloudinary(avatarLocalPath);
-    const coverImage=await uploadOnCloudinary(coverImageLocalPath);
 
-    if(!avatar)
-    {
-        throw new ApiError(406,'Avatar not uploaded to cloudinary')
+    if (!avatarLocalPath) {
+        throw new ApiError(404, 'avatar required')
+    }
+
+    const avatar = await uploadOnCloudinary(avatarLocalPath);
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+
+
+    if (!avatar) {
+        throw new ApiError(406, 'Avatar not uploaded to cloudinary')
     }
 
     const user = await User.create({
-        username:username.toLowerCase(),
+        username: username.toLowerCase(),
         fullname,
         email,
-        avatar:avatar.url,
-        coverImage:coverImage?.url || "",
+        avatar: avatar.url,
+        coverImage: coverImage?.url || "",
         password
     })
 
-    const createdUser=await User.findOne(user.__id).select(
+    const createdUser = await User.findOne(user.__id).select(
         "-password -refreshToken"
     )
 
-    if(!createdUser){
-        throw new ApiError(500,"Something went wrong while registering user")
+    if (!createdUser) {
+        throw new ApiError(500, "Something went wrong while registering user")
     }
 
     return res.status(201).json(
-        new ApiResponse(200,createdUser,"user registered successfully")
+        new ApiResponse(200, createdUser, "user registered successfully")
     )
 });
 
