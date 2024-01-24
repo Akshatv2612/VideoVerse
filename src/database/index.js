@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { DB_NAME } from '../constants.js';
+import { ApiError } from '../utils/ApiError.js';
 
 const dbconnect = async ()=>{
     try{
@@ -7,8 +8,7 @@ const dbconnect = async ()=>{
         console.log("DATABASE CONNECTION SUCCESSFUL, \nHOST:",(await connectionInstance).connection.host);
     }
     catch(error){
-        console.log(error);
-        throw error;
+        throw new ApiError(410,"DATABASE CONNECTIVITY ERROR",error)
         process.exit(1);
     }
 }

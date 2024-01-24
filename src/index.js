@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import app from "./app.js"
 import dbconnect from "./database/index.js";
+import { ApiError } from "./utils/ApiError.js";
 dotenv.config({
     path: "./.env"
 })
@@ -16,7 +17,7 @@ dbconnect()
     })
 })
 .catch((error)=>{
-    console.log("DATABASE CONNECTIVITY PROBLEM",error)
+    throw new ApiError(420,"DATABASE CONNECTIVITY ERROR",error)
 })
 
 
