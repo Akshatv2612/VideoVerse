@@ -5,7 +5,7 @@ import { ApiError } from "./utils/ApiError.js";
 dotenv.config({
     path: "./.env"
 })
-            
+
 dbconnect()
 .then(()=>{
     app.on('error',(error)=>{
