@@ -29,7 +29,7 @@ router
         uploadVideo
     )
 router
-    .route("/v/:videoId")
+    .route("/:videoId")
     .delete(secureVerifyJWT, deleteVideo)
     .get(insecureVerifyJWT, getVideo)
     .patch(secureVerifyJWT, upload.single("thumbnail"), updateVideo)

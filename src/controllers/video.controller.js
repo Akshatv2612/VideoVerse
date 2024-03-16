@@ -119,18 +119,15 @@ const getVideo = asyncHandler(async (req, res) => {
 })
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    const options={
-        page:1,
-        limit:2
-    }
-    
+    const {page=1,limit=10}=req.query
+
     const videos = await Video.aggregatePaginate([
         {
             $match: {
                 isPublished: true
             }
         }
-    ],options)
+    ],{page,limit})
 
     return res
         .status(200)
