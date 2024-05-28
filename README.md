@@ -32,5 +32,5 @@ Here is the overview of the features of the project with respect to different ac
 * Leveraged MongoDB aggregation pipelines for optimized data retrieval and manipulation, enhancing overall platform performance.
 * Good practices are followed while writting the code of the project.
 
-##Future work
+## Future work
 Developing frontend for this application.
