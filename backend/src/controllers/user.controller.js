@@ -21,7 +21,7 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
     }
 }
 
-const registerUser = asyncHandler(async (req, res) => {
+const registerUser = asyncHandler(async (req, res, next) => {
     // get user details from frontend
     // validation - not empty
     // check if user already exists: username, email
@@ -31,7 +31,6 @@ const registerUser = asyncHandler(async (req, res) => {
     // remove password and refresh token field from response
     // check for user creation
     // return response
-
     const { username, email, fullname, password } = req.body
 
     if ([username, email, fullname, password].some((field) => !field?.trim()))  //?. is optional chainning operator, It will not throw error if method in not there.
@@ -44,7 +43,7 @@ const registerUser = asyncHandler(async (req, res) => {
     })
 
     if (existedUser) {
-        throw new ApiError(402, 'username or email already present')
+        throw new ApiError(401, 'Username or Email already present')
     }
 
     const avatarLocalPath = req.files?.avatar[0]?.path
@@ -54,14 +53,14 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     if (!avatarLocalPath) {
-        throw new ApiError(404, 'avatar required')
+        throw new ApiError(402, 'Avatar required')
     }
 
     const avatar = await uploadOnCloudinary(avatarLocalPath);
     const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
     if (!avatar) {
-        throw new ApiError(406, 'Avatar not uploaded to cloudinary')
+        throw new ApiError(405, 'Avatar not uploaded to cloudinary')
     }
 
     const user = await User.create({
@@ -78,15 +77,16 @@ const registerUser = asyncHandler(async (req, res) => {
     )
 
     if (!createdUser) {
-        throw new ApiError(500, "Something went wrong while registering user")
+        throw new ApiError(405, "Something went wrong while registering user")
     }
 
-    return res.status(201).json(
+    return res.status(200).json(
         new ApiResponse(200, createdUser, "user registered successfully")
     )
 });
 
 const loginUser = asyncHandler(async (req, res) => {
+    console.log('Request',req)
     //Get data from user
     //check data
     //find data in database
@@ -104,13 +104,13 @@ const loginUser = asyncHandler(async (req, res) => {
     })
 
     if (!user) {
-        throw new ApiError(401, "User not registered")
+        throw new ApiError(405, "User not registered")
     }
 
     const isPasswordValid = await user.isPasswordCorrect(password)
 
     if (!isPasswordValid) {
-        throw new ApiError(402, "Password Incorrect")
+        throw new ApiError(401, "Password Incorrect")
     }
 
     const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user._id)

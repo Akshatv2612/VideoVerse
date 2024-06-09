@@ -13,6 +13,7 @@ import {
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { secureVerifyJWT, insecureVerifyJWT } from "../middlewares/auth.middleware.js";
+import { errorHandler } from "../middlewares/error.middleware.js";
 
 const router = Router()
 
