@@ -1,0 +1,32 @@
+import React from 'react'
+
+function VideoCard({video}) {
+  return (
+    <div className="w-full">
+      <div className="relative mb-2 w-full pt-[56%]">
+        <div className="absolute inset-0">
+          <img
+            src={video.thumbnailFile}
+            alt={video.title}
+            className="h-full w-full" />
+        </div>
+        <span className="absolute bottom-1 right-1 inline-block rounded bg-black px-1.5 text-sm">{video.duration}</span>
+      </div>
+      <div className="flex gap-x-2">
+        <div className="h-10 w-10 shrink-0">
+          <img
+            src={`${video.owner[0].avatar}`}
+            alt="video.owner.username"
+            className="h-full w-full rounded-full" />
+        </div>
+        <div className="w-full">
+          <h6 className="mb-1 font-semibold">{video.title}</h6>
+          <p className="flex text-sm text-gray-200">11.k Views · 5 hours ago</p>
+          <p className="text-sm text-gray-200">{video.owner[0].username}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default VideoCard

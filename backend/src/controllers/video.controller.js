@@ -50,24 +50,24 @@ const uploadVideo = asyncHandler(async (req, res) => {
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
-    const {title, description} = req.body
-    if([title, description].some((field) => !field?.trim())) {
+    const { title, description } = req.body
+    if ([title, description].some((field) => !field?.trim())) {
         throw new ApiError(400, "Title and Description are required")
     }
 
     const videoId = req.params?.videoId
-    const video= await Video.findById(videoId)
-    if(!video){ throw new ApiError(404, "Video not found")}
+    const video = await Video.findById(videoId)
+    if (!video) { throw new ApiError(404, "Video not found") }
 
     const userId = req.user?._id
 
-    if(!userId || !video.owner.equals(userId)){
+    if (!userId || !video.owner.equals(userId)) {
         throw new ApiError(400, "Unauthorized request")
     }
-    
+
     const thumbnailLocalPath = req.file?.path
     const thumbnailResource = await uploadOnCloudinary(thumbnailLocalPath)
-    if(!thumbnailResource){
+    if (!thumbnailResource) {
         throw new ApiError(400, "Thumbnail not uploaded to cloudinary")
     }
 
@@ -77,20 +77,20 @@ const updateVideo = asyncHandler(async (req, res) => {
         title,
         description,
         thumbnailFile: thumbnailResource.url
-    }, {new:true})
+    }, { new: true })
 
     return res
-    .status(200)
-    .json(
-        new ApiResponse(200, updatedVideo, "Video updated successfully")
-    )
+        .status(200)
+        .json(
+            new ApiResponse(200, updatedVideo, "Video updated successfully")
+        )
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {
     const videoId = req.params?.videoId
     const userId = req.user?._id
     const video = await Video.findById(videoId)
-    if(!video){ throw new ApiError(404, "Video not found")}
+    if (!video) { throw new ApiError(404, "Video not found") }
 
     if (!userId || !video.owner.equals(userId)) {
         throw new ApiError(400, "Unauthorized request")
@@ -109,7 +109,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
 const getVideo = asyncHandler(async (req, res) => {
     const videoId = req.params?.videoId
     const video = await Video.findById(videoId)
-    if(!video){ throw new ApiError(404, "Video not found")}
+    if (!video) { throw new ApiError(404, "Video not found") }
 
     return res
         .status(200)
@@ -119,15 +119,38 @@ const getVideo = asyncHandler(async (req, res) => {
 })
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    const {page=1,limit=10}=req.query
+    const { page = 1, limit = 10 } = req.query
 
-    const videos = await Video.aggregatePaginate([
+    const options = {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
+    };
+
+    const aggregateQuery = Video.aggregate([
         {
             $match: {
                 isPublished: true
             }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline:[
+                    {
+                        $project:{
+                            avatar:1,
+                            username:1
+                        }
+                    }
+                ]
+            }
         }
-    ],{page,limit})
+    ]);
+
+    const videos = await Video.aggregatePaginate(aggregateQuery, options);
 
     return res
         .status(200)

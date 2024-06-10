@@ -1,7 +1,7 @@
 import SignupUser from "../components/Signup"
 import { useSelector } from "react-redux"
 import Loading from "../components/popups/Loading.jsx"
-import Logo from "../components/Logo.jsx"
+import Logo from "../components/icons/Logo.jsx"
 import { Link } from "react-router-dom"
 import { useEffect,useRef } from "react"
 
