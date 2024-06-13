@@ -8,6 +8,7 @@ import Signup from './pages/Signup.jsx'
 import Login from './pages/Login.jsx'
 import Home from './pages/Home.jsx'
 import App from './app.jsx'
+import VideoDetail from './pages/VideoDetail.jsx'
 
 const router = createBrowserRouter([{
   path: 'signup',
@@ -23,7 +24,11 @@ const router = createBrowserRouter([{
   children: [
     {
       path: '/',
-      element: (<Home/>)
+      element: (<Home />)
+    },
+    {
+      path: '/v/:videoId',
+      element: (<VideoDetail />)
     }
   ]
 }])

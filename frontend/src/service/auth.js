@@ -37,13 +37,25 @@ export class AuthService {
     }
 
     async logoutUser() {
-        const response = await fetch(`${conf.serverUrl}/${conf.type}/${conf.version}/logout`, {
+        const response = await fetch(`${conf.serverUrl}${conf.type}/${conf.version}/users/logout`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
-            }
+            },
+            credentials: "include"
         })
-        return response
+        return response.json()
+    }
+
+    async getCurrentUser(){
+        const response = await fetch(`${conf.serverUrl}${conf.type}/${conf.version}/users`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include"
+        })
+        return response.json()
     }
 }
 

@@ -5,7 +5,7 @@ const type = conf.type
 const version = conf.version
 
 export class VideoService {
-    async getVideos() {
+    async getAllVideos() {
         try {
             const res = await fetch(`${serverUrl}${type}/${version}/videos`, {
                 method: "GET",
@@ -16,7 +16,21 @@ export class VideoService {
             return await res.json()
 
         } catch (error) {
-            console.log('Error::service/video.js::Error while fetching videos',error)
+            console.log('Error::service/video.js::Error while fetching all videos',error)
+        }
+    }
+
+    async getVideo(videoId){
+        try{
+            const res = await fetch(`${serverUrl}${type}/${version}/videos/${videoId}`,{
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            return await res.json()
+        }catch(error){
+            console.log('Error::service/video.js::Error while fetching video',error)
         }
     }
 }

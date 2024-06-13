@@ -9,11 +9,11 @@ import {
     updateUserAvatar,
     updateUserCoverImage,
     getUserChannelProfile,
-    getWatchHistory
+    getWatchHistory,
+    getCurrentUser
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { secureVerifyJWT, insecureVerifyJWT } from "../middlewares/auth.middleware.js";
-import { errorHandler } from "../middlewares/error.middleware.js";
 
 const router = Router()
 
@@ -39,5 +39,6 @@ router.route("/avatar").patch(secureVerifyJWT, upload.single('avatar'), updateUs
 router.route("/cover-image").patch(secureVerifyJWT, upload.single('coverimage'), updateUserCoverImage)
 router.route("/history").get(secureVerifyJWT, getWatchHistory)
 router.route("/c/:username").get(insecureVerifyJWT, getUserChannelProfile)
+router.route("/").get(insecureVerifyJWT, getCurrentUser)
 
 export default router

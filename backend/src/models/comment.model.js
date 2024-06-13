@@ -9,7 +9,7 @@ const commentSchema = new Schema({
     video:{
         type:Schema.Types.ObjectId,
         ref:"Video",
-        required:true
+        required:true 
     },
     commentBy:{
         type:Schema.Types.ObjectId,
@@ -18,6 +18,6 @@ const commentSchema = new Schema({
     },
 },{timestamps:true})
 
-commentSchema.plugin(mongooseAggregatePaginate)
+// commentSchema.plugin(mongooseAggregatePaginate)
 
 export const Comment=mongoose.model("Comment",commentSchema)

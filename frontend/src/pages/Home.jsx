@@ -1,21 +1,21 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import NoContent from '../components/NoContent'
 import { PlayIcon } from '../components/icons'
-import VideoCard from '../components/VideoCard'
-import { useDispatch, useSelector } from 'react-redux'
-import videoService from '../service/video.js'
-import { setError, setLoading, setVideos } from '../slices/videoSlice'
+import VideoCard from '../components/VideoCardVertical.jsx'
+import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
+import videoService from '../service/video'
+import { setError, setLoading, setVideos } from '../slices/videoSlice.js'
+import { useEffect } from 'react'
 
 function Home() {
     const videos = useSelector(state => state.video.videos)
     const loading = useSelector(state => state.video.loading)
     const dispatch = useDispatch()
 
-    console.log(videos)
-
     useEffect(() => {
         setLoading(true)
-        videoService.getVideos()
+        videoService.getAllVideos()
         .then(res => {
             if(res.statusCode===200){
                 dispatch(setVideos(res.data.docs))
@@ -27,6 +27,8 @@ function Home() {
         })
         setLoading(false);
     },[])
+
+    console.log(videos)
 
     return (
         <section className="w-full pb-[70px] sm:ml-[70px] sm:pb-0 lg:ml-0">

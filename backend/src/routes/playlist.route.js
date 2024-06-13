@@ -8,16 +8,15 @@ import {
     deletePlaylist,
     updatePlaylist
 } from "../controllers/playlist.controller.js";
-import { secureVerifyJWT } from "../middlewares/auth.middleware.js";
+import {secureVerifyJWT, insecureVerifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router()
-router.use(secureVerifyJWT)
 
 router.route("/")
-    .post(createPlaylist)
+    .post(secureVerifyJWT,createPlaylist)
 
 router.route("/u/:userId")
-    .get(getUserPlaylists)
+    .get(insecureVerifyJWT,getUserPlaylists)
 
 router.route("/:playlistId")
     .get(getPlaylistById)

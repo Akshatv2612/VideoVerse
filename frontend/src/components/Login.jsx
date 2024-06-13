@@ -3,9 +3,14 @@ import Input from "./Input"
 import Button from './Button'
 import authService from '../service/auth'
 import { useDispatch } from 'react-redux'
-import { login, setError, setLoading} from '../slices/authSlice'
+import { setError, setLoading} from '../slices/authSlice'
+import { useCookies } from 'react-cookie'
+import { useNavigate } from 'react-router-dom'
 
 function Login() {
+    const [cookies, setCookie, removeCookie] = useCookies(["user"]);
+    const navigate= useNavigate();
+    
     const {handleSubmit, control, watch, reset} = useForm({
         defaultValues:{
             username:'',
@@ -20,7 +25,9 @@ function Login() {
         const res = await authService.loginUser(data.username,data.email,data.password)
         
         if(res.statusCode===200){
-            dispatch(login(res.data))
+            setCookie('accessToken',res.data.accessToken, {path: '/'})
+            setCookie('refreshToken',res.data.refreshToken, {path: '/'})
+            navigate('/')
         }
         else
         {

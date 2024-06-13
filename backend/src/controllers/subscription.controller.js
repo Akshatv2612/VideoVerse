@@ -153,5 +153,5 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 export {
     togglesubscription,
     getSubscriptions,
-    getUserChannelSubscribers
+    getUserChannelSubscribers,
 }

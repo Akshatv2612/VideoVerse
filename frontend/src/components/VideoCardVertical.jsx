@@ -1,8 +1,17 @@
 import React from 'react'
+import timeAgo from '../utils/timeInterval'
+import { useNavigate } from 'react-router-dom'
 
 function VideoCard({video}) {
+  const navigate = useNavigate()
+  const time=timeAgo(video.createdAt)
+
+  const cardClickHandler = () => {
+    navigate(`/v/${video._id}`)
+  }
+
   return (
-    <div className="w-full">
+    <div onClick={cardClickHandler} className="w-full hover:cursor-pointer">
       <div className="relative mb-2 w-full pt-[56%]">
         <div className="absolute inset-0">
           <img
@@ -21,7 +30,7 @@ function VideoCard({video}) {
         </div>
         <div className="w-full">
           <h6 className="mb-1 font-semibold">{video.title}</h6>
-          <p className="flex text-sm text-gray-200">11.k Views · 5 hours ago</p>
+          <p className="flex text-sm text-gray-200">{`132 views | ${time}`}</p>
           <p className="text-sm text-gray-200">{video.owner[0].username}</p>
         </div>
       </div>

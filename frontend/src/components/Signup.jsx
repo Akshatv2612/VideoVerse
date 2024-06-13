@@ -3,10 +3,14 @@ import Input from "./Input"
 import Button from './Button'
 import authService from '../service/auth'
 import { useDispatch } from 'react-redux'
-import { login, setError, setLoading } from '../slices/authSlice'
+import { setError, setLoading } from '../slices/authSlice'
+import { useCookies } from 'react-cookie'
+import { useNavigate } from 'react-router-dom'
 
 function Signup() {
-    const { handleSubmit, control, reset} = useForm({
+    const [cookie, setCookie, removeCookie ] = useCookies(["user"]);
+    const navigate = useNavigate()
+    const { handleSubmit, control, reset } = useForm({
         defaultValues: {
             username: '',
             fullname: '',
@@ -22,7 +26,18 @@ function Signup() {
         dispatch(setLoading(true))
         const res = await authService.registerUser(data.username, data.fullname, data.avatar, data.coverimage, data.email, data.password)
         if (res.statusCode === 200) {
-            dispatch(login(res.data))
+            const res = await authService.loginUser(data.username, data.email, data.password)
+
+            if (res.statusCode === 200) {
+                setCookie('accessToken', res.data.accessToken, { path: '/' })
+                setCookie('refreshToken', res.data.refreshToken, { path: '/' })
+                navigate('/')
+            }
+            else {
+                dispatch(setError(res.message))
+            }
+            reset()
+            navigate('/')
         }
         else {
             dispatch(setError(res.message))

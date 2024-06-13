@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/AsyncHandler.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import mongoose from "mongoose";
 import Jwt from "jsonwebtoken";
 
 const generateAccessTokenAndRefreshToken = async (userId) => {
@@ -118,8 +119,8 @@ const loginUser = asyncHandler(async (req, res) => {
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
     const options = {
-        httpOnly: true,
-        secure: true
+        httpOnly: false,
+        secure: false
     }
 
     return res
@@ -322,14 +323,13 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
     const username = req.params.username
-
     if (!username?.trim) {
         throw new ApiError(400, "username is missing")
     }
     const channel = await User.aggregate([
         {
             $match: {
-                username: username.toLowerCase()
+                $or: [{ username: username }, { _id: new mongoose.Types.ObjectId(username)}]
             }
         },
         {
@@ -377,7 +377,6 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
             }
         }
     ])
-    console.log(channel)
 
     if (!channel?.length) {
         throw new ApiError(400, "channel not fetched")

@@ -2,6 +2,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import { Comment } from "../models/comment.model.js";
+import mongoose from "mongoose";
 
 const createComment = asyncHandler(async (req, res) => {
     const { content } = req.body
@@ -80,21 +81,56 @@ const deleteComment = asyncHandler(async (req, res) => {
 })
 
 const getAllvideoComments = asyncHandler(async (req, res) => {
-    const videoId = req.params?.videoId
-    const { page = 1, limit = 10 } = req.query
-    const comments = await Comment.aggregatePaginate([
+    const videoId = req.params?.videoId;
+    const { page = 1, limit = 10 } = req.query;
+
+    const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
+    const limitVal = parseInt(limit, 10);
+
+    const comments = await Comment.aggregate([
         {
             $match: {
-                video: videoId
+                video: new mongoose.Types.ObjectId(videoId)
             }
-        }
-    ], { page, limit })
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "commentBy",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $project: {
+                            fullname: 1,
+                            username: 1,
+                            avatar: 1
+                        }
+                    }
+                ]
+            }
+        },
+        { $skip: skip },
+        { $limit: limitVal }
+    ]);
+
+    // Calculate total count for pagination metadata
+    const totalComments = await Comment.countDocuments({ video: videoId });
+    const totalPages = Math.ceil(totalComments / limitVal);
+
+    const result = {
+        comments,
+        page: parseInt(page, 10),
+        limit: limitVal,
+        totalPages,
+        totalComments
+    };
 
     return res
         .status(200)
         .json(
-            new ApiResponse(200, comments, "All comments fetched successfully")
-        )
+            new ApiResponse(200, result, "All comments fetched successfully")
+        );
 })
 
 export {

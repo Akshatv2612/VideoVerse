@@ -1,4 +1,5 @@
 import mongoose, {Schema} from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const playlistSchema = new Schema({
     title:{
@@ -6,8 +7,7 @@ const playlistSchema = new Schema({
         required:true
     },
     description:{
-        type:String,
-        required:true
+        type:String
     },
     videos:[
         {
@@ -21,5 +21,7 @@ const playlistSchema = new Schema({
         required:true
     }
 },{timestamps:true})
+
+playlistSchema.plugin(mongooseAggregatePaginate)
 
 export const Playlist=mongoose.model("Playlist",playlistSchema)

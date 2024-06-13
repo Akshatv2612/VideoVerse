@@ -6,11 +6,10 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/AsyncHandler.js"
 
 const createPlaylist = asyncHandler(async (req, res) => {
-    console.log(req.body)
     const { title, description } = req.body
 
-    if ([title, description].some((field) => !field?.trim())) {
-        throw new ApiError(400, "Title and Description are required")
+    if (!title) {
+        throw new ApiError(400, "Title is required")
     }
 
     const playlistBy = req?.user?._id
@@ -30,18 +29,27 @@ const createPlaylist = asyncHandler(async (req, res) => {
 })
 
 const getUserPlaylists = asyncHandler(async (req, res) => {
+    const { page = 1, limit = 10 } = req.query
+
+    const options = {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
+    };
+
     const { userId } = req.params
     if (!userId) {
         throw new ApiError(400, "User Id not found")
     }
 
-    const playlists = await Playlist.aggregate([
+    const aggregateQuery = Playlist.aggregate([
         {
             $match: {
                 playlistBy: new mongoose.Types.ObjectId(userId)
             }
         },
     ])
+
+    const playlists= await Playlist.aggregatePaginate(aggregateQuery, options);
 
     if (!playlists) {
         throw new ApiError(404, "Error while fetching playlists")
